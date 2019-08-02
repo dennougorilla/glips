@@ -1,15 +1,13 @@
 import 'dart:html';
 import 'package:angular/angular.dart';
 
-import 'src/get_display_media.dart';
-
-// AngularDart info: https://webdev.dartlang.org/angular
-// Components info: https://webdev.dartlang.org/components
+import 'package:glips/src/get_display_media.dart';
 
 @Component(
-  selector: 'my-app',
-  styleUrls: ['app_component.css'],
-  templateUrl: 'app_component.html',
+  selector: 'screen',
+  styles: [''],
+  template: ''
+
   //directives: [],
 )
 class AppComponent {
