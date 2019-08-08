@@ -1,3 +1,23 @@
 <h1>glips</h1>
-<div #screen></div>
-<button (click)="startScreenRecord()">Click me!</button>
+<modal [(visible)]="showClipEditorDialog">
+    <material-dialog>
+  
+      <h1 header>Clip Editor</h1>
+  
+      <clip-editor [clip]="canvasData"></clip-editor>
+
+      <div footer>
+        <material-button autoFocus clear-size (trigger)="saveClip()">
+          Close
+        </material-button>
+      </div>
+  
+    </material-dialog>
+  </modal>
+
+<canvas #screen></canvas>
+<material-button (trigger)="openEditor()"
+                 [disabled]="showClipEditorDialog"
+                 raised>
+  Open Basic Dialog
+</material-button>
