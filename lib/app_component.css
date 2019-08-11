@@ -4,3 +4,11 @@
 :host(.canvas) {
     width: 80%;
 }
+
+.max-height-dialog {
+    max-height: 90vh;
+}
+
+:host(.max-height-dialog) {
+    max-height: 90vh;
+}

@@ -22,7 +22,6 @@ import 'src/get_display_media.dart';
     MaterialButtonComponent,
     MaterialDialogComponent,
     ModalComponent,
-    ClipEditor
   ],
 )
 class AppComponent implements AfterViewInit {

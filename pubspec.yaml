@@ -8,6 +8,7 @@ environment:
   sdk: '>=2.5.0-dev.1.0 <3.0.0'
 
 dependencies:
+  image: ^2.1.4
   sass_builder: ^2.0.0
   js: any
   angular: ^6.0.0-alpha+1

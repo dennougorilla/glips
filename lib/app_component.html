@@ -1,23 +1,21 @@
 <h1>glips</h1>
 <modal [(visible)]="showClipEditorDialog">
-    <material-dialog>
-  
-      <h1 header>Clip Editor</h1>
-  
-      <clip-editor [clip]="canvasData"></clip-editor>
+  <material-dialog class="max-height-dialog" style="max-height: 85vh">
 
-      <div footer>
-        <material-button autoFocus clear-size (trigger)="saveClip()">
-          Close
-        </material-button>
-      </div>
-  
-    </material-dialog>
-  </modal>
+    <h1 header>Clip Editor</h1>
+
+    <clip-editor [clip]="canvasData"></clip-editor>
+
+    <div footer>
+      <material-button autoFocus clear-size (trigger)="closeEditor()">
+        Close
+      </material-button>
+    </div>
+
+  </material-dialog>
+</modal>
 
 <canvas #screen></canvas>
-<material-button (trigger)="openEditor()"
-                 [disabled]="showClipEditorDialog"
-                 raised>
-  Open Basic Dialog
+<material-button (trigger)="openEditor()" [disabled]="showClipEditorDialog && (clip.frameQueue.length < 300)" raised>
+  Clip
 </material-button>
