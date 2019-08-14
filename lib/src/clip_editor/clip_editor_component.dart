@@ -65,16 +65,28 @@ class ClipEditor implements AfterViewInit, AfterChanges {
   }
 
   void saveClip() async {
+    final dataList = clip.frameQueue
+        .skip(start)
+        .toList()
+        .sublist(start, stop)
+        .map((frame) => frame.data)
+        .toList();
     Worker w = Worker('worker/worker.dart.js');
     MessageChannel msgChn = MessageChannel();
-    w.postMessage({'port': msgChn.port1},
-        [msgChn.port1]);
+    w.postMessage({
+      'port': msgChn.port1,
+      'width': clipCanvas.width,
+      'height': clipCanvas.height,
+      'dataList': dataList
+    }, [
+      msgChn.port1
+    ]);
     final message = await msgChn.port2.onMessage.first;
-    print(message.data == 1);
-    //final bytes = message.data;
-    //final gif64 = base64.encode(bytes);
-    //final image = ImageElement()..src = 'data:image/png;base64,${gif64}';
-    //document.body.append(image);
+    print(message.data);
+    final bytes = message.data;
+    final gif64 = base64.encode(bytes);
+    final image = ImageElement()..src = 'data:image/png;base64,${gif64}';
+    document.body.append(image);
   }
 
   @override

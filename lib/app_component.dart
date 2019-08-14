@@ -22,6 +22,7 @@ import 'src/get_display_media.dart';
     MaterialButtonComponent,
     MaterialDialogComponent,
     ModalComponent,
+    ClipEditor,
   ],
 )
 class AppComponent implements AfterViewInit {
@@ -44,11 +45,6 @@ class AppComponent implements AfterViewInit {
       ..autoplay = true
       ..srcObject = stream;
 
-    final screenOption = dumpOptionsInfo(video);
-    screenCanvas
-      ..width = screenOption['width']
-      ..height = screenOption['height'];
-
     var render = Timer.periodic(const Duration(milliseconds: 33),
         (Timer t) => drawVideo(screenCanvas, video, clip));
   }
@@ -56,8 +52,9 @@ class AppComponent implements AfterViewInit {
   void drawVideo(CanvasElement canvas, VideoElement video, Clip clip) {
     final screenOption = dumpOptionsInfo(video);
     canvas
-      ..width = screenOption['width']
-      ..height = screenOption['height']
+      ..width = screenOption['width'] ~/ 2
+      ..height = screenOption['height'] ~/ 2
+      ..context2D.scale(0.5, 0.5)
       ..context2D.drawImage(video, 0, 0);
 
     clip.setImage(
@@ -69,7 +66,7 @@ class AppComponent implements AfterViewInit {
     canvasData = clip;
   }
 
-  void saveClip() {
+  void closeEditor() {
     showClipEditorDialog = false;
     canvasData = null;
   }
