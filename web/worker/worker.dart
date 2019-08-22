@@ -1,25 +1,22 @@
-import 'dart:convert';
 import 'dart:html';
 import 'dart:typed_data';
-import 'package:image/image.dart';
+import 'package:glips/src/color_quantizations.dart';
+import 'package:gifencoder/gifencoder.dart';
 
 class MyWorker {
   MyWorker() {
     print('Worker Running');
 
     dws.onMessage.listen((MessageEvent evt) {
-      //Encoding
-      evt.data['dataList']
-          .map((data) {
-            print(data);
-            final bytes = Uint8ClampedList.fromList(data);
-            return Image.fromBytes(
-                evt.data['width'], evt.data['height'], bytes);
-          })
-          .toList()
-          .forEach( (image) => encoder.addFrame(image));
-      final bytes = encoder.finish();
-
+      print('listen');
+      final frames = GifBuffer(evt.data['width'], evt.data['height']);
+      final dataList = evt.data['dataList'];
+      for(var i = 0; i < (dataList as List).length; i++) {
+        final bytes = Uint8ClampedList.fromList(dataList[i]);
+        grayScale(bytes);
+        frames.add(bytes);
+      }
+      final bytes = frames.build(30);
       final port = evt.data['port'];
       print(port);
       port.postMessage(bytes);
@@ -27,7 +24,6 @@ class MyWorker {
   }
 
   DedicatedWorkerGlobalScope dws = DedicatedWorkerGlobalScope.instance;
-  GifEncoder encoder = GifEncoder()..repeat = 0;
 }
 
 main() {

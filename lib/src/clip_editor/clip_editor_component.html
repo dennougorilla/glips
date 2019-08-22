@@ -1,0 +1,18 @@
+  <div style = "text-align:center;">
+  <canvas #canvas></canvas>
+  <p>{{index}}/{{max}}    [{{start}}:{{stop}}]</p>
+    <material-slider
+                   [min]="0"
+                   [(max)]="max"
+                   [(value)]="index"
+                   [disabled]="false"></material-slider>
+    <material-slider [isTwoSided]="true"
+                   [min]="0"
+                   [(max)]="max"
+                   [(leftValue)]="start"
+                   [(value)]="stop"
+                   [disabled]="false"></material-slider>
+  <material-button raised autoFocus clear-size (trigger)="saveClip()">
+    Save
+  </material-button>
+  </div>

@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:html';
-import 'package:image/image.dart';
+import 'dart:typed_data';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:angular_components/material_slider/material_slider.dart';
@@ -9,26 +8,7 @@ import 'package:glips/src/clip.dart';
 
 @Component(
   selector: 'clip-editor',
-  template: '''
-  <div style = "text-align:center;">
-  <canvas #canvas></canvas>
-  <p>{{index}}/{{max}}    [{{start}}:{{stop}}]</p>
-    <material-slider
-                   [min]="0"
-                   [(max)]="max"
-                   [(value)]="index"
-                   [disabled]="false"></material-slider>
-    <material-slider [isTwoSided]="true"
-                   [min]="0"
-                   [(max)]="max"
-                   [(leftValue)]="start"
-                   [(value)]="stop"
-                   [disabled]="false"></material-slider>
-  <material-button raised autoFocus clear-size (trigger)="saveClip()">
-    Save
-  </material-button>
-  </div>
-  ''',
+  templateUrl: 'clip_editor_component.html',
   styles: ['canvas {width: 60%; height: auto;}'],
   directives: [MaterialSliderComponent, MaterialButtonComponent],
 )
@@ -71,8 +51,8 @@ class ClipEditor implements AfterViewInit, AfterChanges {
         .sublist(start, stop)
         .map((frame) => frame.data)
         .toList();
-    Worker w = Worker('worker/worker.dart.js');
-    MessageChannel msgChn = MessageChannel();
+    final w = Worker('worker/worker.dart.js');
+    final msgChn = MessageChannel();
     w.postMessage({
       'port': msgChn.port1,
       'width': clipCanvas.width,
@@ -82,12 +62,23 @@ class ClipEditor implements AfterViewInit, AfterChanges {
       msgChn.port1
     ]);
     final message = await msgChn.port2.onMessage.first;
-    print(message.data);
-    final bytes = message.data;
-    final gif64 = base64.encode(bytes);
-    final image = ImageElement()..src = 'data:image/png;base64,${gif64}';
+    final dataUrl = await createDataUrl(message.data);
+    final image = ImageElement()..src = dataUrl;
     document.body.append(image);
   }
+  Future<String> createDataUrl(Uint8List bytes) {
+  final c = Completer<String>();
+  final f = FileReader();
+  f.onLoadEnd.listen((ProgressEvent e) {
+    if (f.readyState == FileReader.DONE) {
+      final String url = f.result;
+      c.complete(url.replaceFirst("data:;", "data:image/gif;"));
+    }
+  });
+  f.readAsDataUrl(Blob([bytes]));
+  return c.future;
+}
+
 
   @override
   void ngAfterViewInit() {}
