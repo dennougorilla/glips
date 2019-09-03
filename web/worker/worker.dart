@@ -6,26 +6,30 @@ import 'package:gifencoder/gifencoder.dart';
 class MyWorker {
   MyWorker() {
     print('Worker Running');
-
+    GifBuffer frames;
     dws.onMessage.listen((MessageEvent evt) {
-      print('listen');
-      final frames = GifBuffer(evt.data['width'], evt.data['height']);
-      final dataList = evt.data['dataList'];
-      for(var i = 0; i < (dataList as List).length; i++) {
-        final bytes = Uint8ClampedList.fromList(dataList[i]);
+      if (evt.data['status'] == 'init') {
+        print('init');
+        frames = GifBuffer(evt.data['width'], evt.data['height']);
+      }
+      if (evt.data['status'] == 'add') {
+        print('add');
+        final bytes = Uint8ClampedList.fromList(evt.data['data']);
         grayScale(bytes);
         frames.add(bytes);
       }
-      final bytes = frames.build(30);
-      final port = evt.data['port'];
-      print(port);
-      port.postMessage(bytes);
+      if (evt.data['status'] == 'build') {
+        print('build');
+        final bytes = frames.build(30);
+        final port = evt.data['port'];
+        print(port);
+        port.postMessage(bytes);
+      }
     });
   }
-
   DedicatedWorkerGlobalScope dws = DedicatedWorkerGlobalScope.instance;
 }
 
-main() {
+void main() {
   MyWorker();
 }

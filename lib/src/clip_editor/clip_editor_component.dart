@@ -17,6 +17,7 @@ class ClipEditor implements AfterViewInit, AfterChanges {
   Clip clip;
 
   List<ImageData> frames;
+
   int max = 1;
   int index = 0;
   int start = 0;
@@ -46,15 +47,24 @@ class ClipEditor implements AfterViewInit, AfterChanges {
   }
 
   void saveClip() async {
-    final dataList =
-        frames.sublist(start, stop).map((frame) => frame.data).toList();
+    final dataList = frames
+        .sublist(start, stop)
+        .map((frame) => Uint8List.fromList(frame.data))
+        .toList();
     final w = Worker('worker/worker.dart.js');
     final msgChn = MessageChannel();
     w.postMessage({
-      'port': msgChn.port1,
+      'status': 'init',
       'width': clipCanvas.width,
       'height': clipCanvas.height,
-      'dataList': dataList
+    });
+    dataList.forEach((data) {
+      w.postMessage({'status': 'add', 'data': data},
+          [data.buffer]);
+    });
+    w.postMessage({
+      'status': 'build',
+      'port': msgChn.port1,
     }, [
       msgChn.port1
     ]);
