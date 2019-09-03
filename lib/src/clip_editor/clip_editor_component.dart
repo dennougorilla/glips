@@ -16,6 +16,7 @@ class ClipEditor implements AfterViewInit, AfterChanges {
   @Input()
   Clip clip;
 
+  List<ImageData> frames;
   int max = 1;
   int index = 0;
   int start = 0;
@@ -27,7 +28,7 @@ class ClipEditor implements AfterViewInit, AfterChanges {
   Timer clipRender;
 
   void renderClip() async {
-    final frames = clip.frameQueue.toList();
+    frames = clip.frameQueue.toList();
     clipCanvas
       ..width = frames[0].width
       ..height = frames[0].height;
@@ -45,12 +46,8 @@ class ClipEditor implements AfterViewInit, AfterChanges {
   }
 
   void saveClip() async {
-    final dataList = clip.frameQueue
-        .skip(start)
-        .toList()
-        .sublist(start, stop)
-        .map((frame) => frame.data)
-        .toList();
+    final dataList =
+        frames.sublist(start, stop).map((frame) => frame.data).toList();
     final w = Worker('worker/worker.dart.js');
     final msgChn = MessageChannel();
     w.postMessage({
@@ -66,19 +63,19 @@ class ClipEditor implements AfterViewInit, AfterChanges {
     final image = ImageElement()..src = dataUrl;
     document.body.append(image);
   }
-  Future<String> createDataUrl(Uint8List bytes) {
-  final c = Completer<String>();
-  final f = FileReader();
-  f.onLoadEnd.listen((ProgressEvent e) {
-    if (f.readyState == FileReader.DONE) {
-      final String url = f.result;
-      c.complete(url.replaceFirst("data:;", "data:image/gif;"));
-    }
-  });
-  f.readAsDataUrl(Blob([bytes]));
-  return c.future;
-}
 
+  Future<String> createDataUrl(Uint8List bytes) {
+    final c = Completer<String>();
+    final f = FileReader();
+    f.onLoadEnd.listen((ProgressEvent e) {
+      if (f.readyState == FileReader.DONE) {
+        final String url = f.result;
+        c.complete(url.replaceFirst("data:;", "data:image/gif;"));
+      }
+    });
+    f.readAsDataUrl(Blob([bytes]));
+    return c.future;
+  }
 
   @override
   void ngAfterViewInit() {}
