@@ -41,35 +41,20 @@ class ClipEditor implements AfterViewInit, AfterChanges {
       ..ey = clip.frameQueue.first.height;
 
     frames = clip.frameQueue.toList();
-    clipCanvas
-      ..width = frames[0].width
-      ..height = frames[0].height
-      ..addEventListener('click', (e) {
-        final rect = clipCanvas.getBoundingClientRect();
-        if (!isDown) {
-          cropRange
-            ..bx = (e as MouseEvent).client.x - rect.left.toInt()
-            ..by = (e as MouseEvent).client.y - rect.top.toInt()
-            ..ex = (e as MouseEvent).client.x - rect.left.toInt()
-            ..ey = (e as MouseEvent).client.y - rect.top.toInt();
-          isDown = true;
-        } else {
-          cropRange
-            ..ex = (e as MouseEvent).client.x - rect.left.toInt()
-            ..ey = (e as MouseEvent).client.y - rect.top.toInt();
-          isDown = false;
-        }
-      }, false);
 
     clipRender = Timer.periodic(const Duration(milliseconds: 33), (Timer t) {
+      print('r');
       if (start < index && index < stop) {
         clipCanvas.context2D.putImageData(frames[index], 0, 0);
-        clipCanvas.context2D.setStrokeColorRgb(255,0,0);
+        clipCanvas.context2D.setStrokeColorRgb(255, 0, 0);
         clipCanvas.context2D.strokeRect(
             cropRange.bx, cropRange.by, cropRange.width, cropRange.height);
         index = index + 1;
       } else {
         index = start;
+        clipCanvas.context2D.setStrokeColorRgb(255, 0, 0);
+        clipCanvas.context2D.strokeRect(
+            cropRange.bx, cropRange.by, cropRange.width, cropRange.height);
         clipCanvas.context2D.putImageData(frames[index], 0, 0);
         index = index + 1;
       }
@@ -105,7 +90,25 @@ class ClipEditor implements AfterViewInit, AfterChanges {
   }
 
   @override
-  void ngAfterViewInit() {}
+  void ngAfterViewInit() {
+    clipCanvas.addEventListener('click', (e) {
+      print('click');
+      final rect = clipCanvas.getBoundingClientRect();
+      if (!isDown) {
+        cropRange
+          ..bx = (e as MouseEvent).client.x - rect.left.toInt()
+          ..by = (e as MouseEvent).client.y - rect.top.toInt()
+          ..ex = (e as MouseEvent).client.x - rect.left.toInt()
+          ..ey = (e as MouseEvent).client.y - rect.top.toInt();
+        isDown = true;
+      } else {
+        cropRange
+          ..ex = (e as MouseEvent).client.x - rect.left.toInt()
+          ..ey = (e as MouseEvent).client.y - rect.top.toInt();
+        isDown = false;
+      }
+    }, false);
+  }
 
   @override
   void ngAfterChanges() {
@@ -113,12 +116,18 @@ class ClipEditor implements AfterViewInit, AfterChanges {
     start = 0;
     clipRender?.cancel();
     if (clip != null) {
+      clipCanvas
+        ..width = clip.frameQueue.first.width
+        ..height = clip.frameQueue.first.height;
+
       max = clip.frameQueue.length;
       stop = clip.frameQueue.length;
       renderClip();
-    }
+    } else {}
   }
 }
+
+void setCropRange(Event e) {}
 
 class CropRange {
   int bx, by, ex, ey;
