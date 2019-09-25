@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:html';
-import 'dart:typed_data';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:angular_components/material_slider/material_slider.dart';
@@ -11,7 +10,7 @@ import 'package:js/js.dart';
 @Component(
   selector: 'clip-editor',
   templateUrl: 'clip_editor_component.html',
-  styles: ['canvas {width: 60%; height: auto;}'],
+  styleUrls: ['clip_editor_component.css'],
   directives: [MaterialSliderComponent, MaterialButtonComponent],
 )
 class ClipEditor implements AfterViewInit, AfterChanges {
@@ -25,20 +24,49 @@ class ClipEditor implements AfterViewInit, AfterChanges {
   int start = 0;
   int stop = 1;
 
-  @ViewChild('canvas')
+  bool isDown = false;
+
+  final cropRange = CropRange();
+
+  @ViewChild('clipCanvas')
   CanvasElement clipCanvas;
 
   Timer clipRender;
 
   void renderClip() async {
+    cropRange
+      ..bx = 0
+      ..by = 0
+      ..ex = clip.frameQueue.first.width
+      ..ey = clip.frameQueue.first.height;
+
     frames = clip.frameQueue.toList();
     clipCanvas
       ..width = frames[0].width
-      ..height = frames[0].height;
+      ..height = frames[0].height
+      ..addEventListener('click', (e) {
+        final rect = clipCanvas.getBoundingClientRect();
+        if (!isDown) {
+          cropRange
+            ..bx = (e as MouseEvent).client.x - rect.left.toInt()
+            ..by = (e as MouseEvent).client.y - rect.top.toInt()
+            ..ex = (e as MouseEvent).client.x - rect.left.toInt()
+            ..ey = (e as MouseEvent).client.y - rect.top.toInt();
+          isDown = true;
+        } else {
+          cropRange
+            ..ex = (e as MouseEvent).client.x - rect.left.toInt()
+            ..ey = (e as MouseEvent).client.y - rect.top.toInt();
+          isDown = false;
+        }
+      }, false);
 
     clipRender = Timer.periodic(const Duration(milliseconds: 33), (Timer t) {
       if (start < index && index < stop) {
         clipCanvas.context2D.putImageData(frames[index], 0, 0);
+        clipCanvas.context2D.setStrokeColorRgb(255,0,0);
+        clipCanvas.context2D.strokeRect(
+            cropRange.bx, cropRange.by, cropRange.width, cropRange.height);
         index = index + 1;
       } else {
         index = start;
@@ -49,13 +77,26 @@ class ClipEditor implements AfterViewInit, AfterChanges {
   }
 
   void saveClip() {
-    final width = clipCanvas.width;
-    final height = clipCanvas.height;
+    final width = cropRange.width;
+    final height = cropRange.height;
     final canvas = CanvasElement(width: width, height: height);
+    final source = CanvasElement(
+        width: clip.frameQueue.first.width,
+        height: clip.frameQueue.first.height);
     final gif =
         GIF(Options(workers: 30, quality: 10, width: width, height: height));
     for (var frame in frames.sublist(start, stop)) {
-      canvas.context2D.putImageData(frame, 0, 0);
+      source.context2D.putImageData(frame, 0, 0);
+      canvas.context2D.drawImageScaledFromSource(
+          source,
+          cropRange.bx,
+          cropRange.by,
+          cropRange.width,
+          cropRange.height,
+          0,
+          0,
+          cropRange.width,
+          cropRange.height);
       gif.addFrame(canvas, AddFrameOptions(delay: 33, copy: true));
     }
     gif.on('finished', allowInterop((blob, tmp) {
@@ -77,4 +118,11 @@ class ClipEditor implements AfterViewInit, AfterChanges {
       renderClip();
     }
   }
+}
+
+class CropRange {
+  int bx, by, ex, ey;
+
+  int get width => ex - bx;
+  int get height => ey - by;
 }
