@@ -5,6 +5,8 @@ import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:angular_components/material_slider/material_slider.dart';
 import 'package:glips/src/clip.dart';
+import 'package:glips/src/gif.dart';
+import 'package:js/js.dart';
 
 @Component(
   selector: 'clip-editor',
@@ -46,45 +48,19 @@ class ClipEditor implements AfterViewInit, AfterChanges {
     });
   }
 
-  void saveClip() async {
-    final dataList = frames
-        .sublist(start, stop)
-        .map((frame) => Uint8List.fromList(frame.data))
-        .toList();
-    final w = Worker('worker/worker.dart.js');
-    final msgChn = MessageChannel();
-    w.postMessage({
-      'status': 'init',
-      'width': clipCanvas.width,
-      'height': clipCanvas.height,
-    });
-    dataList.forEach((data) {
-      w.postMessage({'status': 'add', 'data': data},
-          [data.buffer]);
-    });
-    w.postMessage({
-      'status': 'build',
-      'port': msgChn.port1,
-    }, [
-      msgChn.port1
-    ]);
-    final message = await msgChn.port2.onMessage.first;
-    final dataUrl = await createDataUrl(message.data);
-    final image = ImageElement()..src = dataUrl;
-    document.body.append(image);
-  }
-
-  Future<String> createDataUrl(Uint8List bytes) {
-    final c = Completer<String>();
-    final f = FileReader();
-    f.onLoadEnd.listen((ProgressEvent e) {
-      if (f.readyState == FileReader.DONE) {
-        final String url = f.result;
-        c.complete(url.replaceFirst("data:;", "data:image/gif;"));
-      }
-    });
-    f.readAsDataUrl(Blob([bytes]));
-    return c.future;
+  void saveClip() {
+    final width = clipCanvas.width;
+    final height = clipCanvas.height;
+    final canvas = CanvasElement(width: width, height: height);
+    final gif =
+        GIF(Options(workers: 30, quality: 10, width: width, height: height));
+    for (var frame in frames.sublist(start, stop)) {
+      canvas.context2D.putImageData(frame, 0, 0);
+      gif.addFrame(canvas, AddFrameOptions(delay: 33, copy: true));
+    }
+    gif.on('finished', allowInterop((blob, tmp) {
+      window.open(Url.createObjectUrl(blob), 'gif');
+    })).render();
   }
 
   @override
