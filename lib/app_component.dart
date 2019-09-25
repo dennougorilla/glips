@@ -35,11 +35,7 @@ class AppComponent implements AfterViewInit {
 
   @override
   void ngAfterViewInit() async {
-    final displayMediaOptions = {
-      'video': {'cursor': 'never'},
-      'audio': false
-    };
-    final stream = await getDisplayMedia(displayMediaOptions);
+    final stream = await getDisplayMedia();
     final video = VideoElement()
       ..id = 'video'
       ..autoplay = true
