@@ -43,7 +43,6 @@ class ClipEditor implements AfterViewInit, AfterChanges {
     frames = clip.frameQueue.toList();
 
     clipRender = Timer.periodic(const Duration(milliseconds: 33), (Timer t) {
-      print('r');
       if (start < index && index < stop) {
         clipCanvas.context2D.putImageData(frames[index], 0, 0);
         clipCanvas.context2D.setStrokeColorRgb(255, 0, 0);
@@ -92,7 +91,6 @@ class ClipEditor implements AfterViewInit, AfterChanges {
   @override
   void ngAfterViewInit() {
     clipCanvas.addEventListener('click', (e) {
-      print('click');
       final rect = clipCanvas.getBoundingClientRect();
       if (!isDown) {
         cropRange
