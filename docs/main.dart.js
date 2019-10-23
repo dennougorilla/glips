@@ -9076,7 +9076,7 @@ T.ag(r,"href","https://github.com/dennougorilla/glips")
 T.ag(r,"target","_blank")
 H.b(r,"$ip")
 a1.n(r)
-T.bz(r,"Github")
+T.bz(r,"GitHub")
 a6=new O.lk(E.cc(a1,8,1))
 q=$.pG
 if(q==null){q=new O.fG(a2,C.x,"","","")
