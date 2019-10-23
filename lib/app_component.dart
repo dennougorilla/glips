@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:html';
 import 'package:angular/angular.dart';
 import 'package:angular_components/laminate/overlay/module.dart';
+import 'package:angular_components/material_icon/material_icon.dart';
 import 'package:glips/src/clip_editor/clip_editor_component.dart';
 import 'package:angular_components/laminate/components/modal/modal.dart';
 import 'package:angular_components/material_button/material_button.dart';
@@ -15,10 +16,14 @@ import 'src/get_display_media.dart';
 
 @Component(
   selector: 'my-app',
-  styleUrls: ['app_component.css'],
+  styleUrls: [
+    'app_component.css',
+    'package:angular_components/app_layout/layout.scss.css',
+  ],
   templateUrl: 'app_component.html',
   providers: [overlayBindings],
   directives: [
+    MaterialIconComponent,
     MaterialButtonComponent,
     MaterialDialogComponent,
     ModalComponent,
@@ -41,7 +46,7 @@ class AppComponent implements AfterViewInit {
       ..autoplay = true
       ..srcObject = stream;
 
-    var render = Timer.periodic(const Duration(milliseconds: 33),
+    Timer.periodic(const Duration(milliseconds: 33),
         (Timer t) => drawVideo(screenCanvas, video, clip));
   }
 

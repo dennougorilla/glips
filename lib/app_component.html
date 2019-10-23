@@ -1,4 +1,14 @@
-<h1>glips</h1>
+<header class="material-header">
+  <div class="material-header-row">
+    <span class="material-header-title">glips</span>
+    <div class="material-spacer"></div>
+    <nav class="material-navigation">
+      <a href="https://github.com/dennougorilla/glips" target="_blank">
+        Github
+      </a>
+    </nav>
+  </div>
+</header>
 <modal [(visible)]="showClipEditorDialog">
   <material-dialog class="max-height-dialog">
 
@@ -15,7 +25,9 @@
   </material-dialog>
 </modal>
 
-<canvas #screen></canvas>
-<material-button (trigger)="openEditor()" [disabled]="showClipEditorDialog" raised>
-  Clip
-</material-button>
+<div class="center">
+  <canvas #screen></canvas>
+  <material-button (trigger)="openEditor()" [disabled]="showClipEditorDialog" raised>
+    Clip
+  </material-button>
+</div>

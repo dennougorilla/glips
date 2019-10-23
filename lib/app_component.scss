@@ -1,0 +1,23 @@
+@import "package:angular_components/css/material/material";
+
+:host(.canvas) {
+  width: 80%;
+}
+
+.max-height-dialog {
+  max-height: 90vh;
+}
+
+:host(.max-height-dialog) {
+  max-height: 90vh;
+}
+
+a,
+a:visited {
+  text-decoration: none;
+  color: #ffffff;
+}
+.center {
+  margin: 10px;
+  text-align: center;
+}
