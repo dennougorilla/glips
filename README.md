@@ -1,5 +1,9 @@
 # glips
-**This makes it easy to create a gif on the web**.   
+**This makes it easy to create a gif on the web😍**.  
+
+**Only the web!🥳**  
+**No download required!😻**  
+**Without server!💯**  
 
 Inspired by [**Twitch's clip**](https://help.twitch.tv/s/article/how-to-use-clips?language=en_US) feature.
 A **30-second** movie is clipped until the clip button is pressed, and the clip screen and time can be adjusted using ClipEditor.
