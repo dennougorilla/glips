@@ -6,7 +6,7 @@
 **Without server!💯**  
 
 Inspired by [**Twitch's clip**](https://help.twitch.tv/s/article/how-to-use-clips?language=en_US) feature.
-A **30-second** movie is clipped until the clip button is pressed, and the clip screen and time can be adjusted using ClipEditor.
+A **10-second** movie is clipped until the clip button is pressed, and the clip screen and time can be adjusted using ClipEditor.
 When you click the save button, the gif clipped in another tab will be displayed. Save it.　　　
 
 https://dennougorilla.github.io/glips/  　
